@@ -1,0 +1,5 @@
+[spk-el7]
+name=SPK yum repo for RHEL7 (Team Parsec)
+baseurl=http://yum.spk.no/pub/yum-repos/1-vagrant/spk-el7/
+enabled=1
+gpgcheck=0
