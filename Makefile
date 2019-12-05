@@ -7,12 +7,15 @@ VERSION=$(shell wget -qO- http://git.haproxy.org/git/haproxy-${MAINVERSION}.git/
 ifeq ("${VERSION}","./")
 		VERSION="${MAINVERSION}.0"
 endif
-RELEASE=1
+RELEASE=3
 
 all: build
 
 install_prereq:
 	sudo yum install -y pcre-devel make gcc openssl-devel rpm-build systemd-devel wget sed zlib-devel
+
+install_lua:
+	sudo yum install -y lua53
 
 clean:
 	rm -f ./SOURCES/haproxy-${VERSION}.tar.gz
@@ -48,6 +51,20 @@ build: $(build_stages)
 	--define "_builddir %{_topdir}/BUILD" \
 	--define "_buildroot %{_topdir}/BUILDROOT" \
 	--define "_rpmdir %{_topdir}/RPMS" \
-	--define "_srcrpmdir %{_topdir}/SRPMS" \
-	--define "_use_lua ${USE_LUA}" \
-	--define "_use_prometheus ${USE_PROMETHEUS}"
+	--define "_srcrpmdir %{_topdir}/SRPMS"
+
+build-with-lua: install_prereq install_lua clean download-upstream
+	cp -r ./SPECS/* ./rpmbuild/SPECS/ || true
+	cp -r ./SOURCES/* ./rpmbuild/SOURCES/ || true
+	rpmbuild -ba SPECS/haproxy.spec \
+	--define "version ${VERSION}" \
+	--define "release ${RELEASE}" \
+	--define "use_lua 1" \
+	--define "lua_package lua53" \
+	--define "lua_inc /opt/lua53/include" \
+	--define "lua_lib /opt/lua53/lib" \
+	--define "_topdir %(pwd)/rpmbuild" \
+	--define "_builddir %{_topdir}/BUILD" \
+	--define "_buildroot %{_topdir}/BUILDROOT" \
+	--define "_rpmdir %{_topdir}/RPMS" \
+	--define "_srcrpmdir %{_topdir}/SRPMS"

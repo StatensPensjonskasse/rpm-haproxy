@@ -54,6 +54,11 @@ Requires(preun):    systemd
 Requires(postun):   systemd
 %endif
 
+%if 0%{?use_lua}
+BuildRequires:      %{lua_package}
+Requires:           %{lua_package}
+%endif
+
 %description
 HA-Proxy is a TCP/HTTP reverse proxy which is particularly suited for high
 availability environments. Indeed, it can:
@@ -87,6 +92,7 @@ systemd_opts=
 pcre_opts="USE_PCRE=1"
 USE_TFO=
 USE_NS=
+lua_opts="USE_LUA="
 
 %if 0%{?el7} || 0%{?amzn2} || 0%{?el8}
 systemd_opts="USE_SYSTEMD=1"
@@ -98,19 +104,6 @@ USE_TFO=1
 USE_NS=1
 %endif
 
-%if 0%{_use_lua}
-USE_LUA="USE_LUA=1"
-%endif
-
-%if 0%{_use_prometheus}
-USE_PROMETHEUS="EXTRA_OBJS=contrib/prometheus-exporter/service-prometheus.o"
-%endif
-
-%{__make} %{?_smp_mflags} ${USE_LUA} CPU="generic" TARGET="linux-glibc" ${systemd_opts} ${pcre_opts} USE_OPENSSL=1 USE_ZLIB=1 ${regparm_opts} ADDINC="%{optflags}" USE_LINUX_TPROXY=1 USE_THREAD=1 USE_TFO=${USE_TFO} USE_NS=${USE_NS} ${USE_PROMETHEUS} ADDLIB="%{__global_ldflags}"
-
-pushd contrib/halog
-%{__make} ${halog} OPTIMIZE="%{optflags} %{__global_ldflags}"
-popd
 
 pushd contrib/iprange
 %{__make} iprange OPTIMIZE="%{optflags} %{__global_ldflags}"
@@ -118,7 +111,6 @@ popd
 
 %install
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
-
 %{__install} -d %{buildroot}%{_sbindir}
 %{__install} -d %{buildroot}%{_bindir}
 %{__install} -d %{buildroot}%{_sysconfdir}/%{name}
