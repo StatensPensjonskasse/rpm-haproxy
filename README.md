@@ -18,11 +18,31 @@ Perform the following steps on a build box as a regular user.
     cd ./rpm-haproxy
     git checkout 2.0
 
+## Vagrant build box
+
+If you dont have a dedicated rpm build environment and don't want to mess up your local dev mechine
+we have put together a Vagrantfile to quickly run a virtual build environment in VirtualBox.
+Just run:
+
+    Vagrant up
+    vagrant ssh
+    make
+
 ## Build using makefile
 
     make
 
 Resulting RPM will be in /opt/rpm-haproxy/rpmbuild/RPMS/x86_64/
+
+## Build haproxy with lua
+
+    make build-with-lua
+
+This goal is building haproxy with lua 5.3 binding.
+The build relies on a yum repository with lua53 package available on the build host.
+This lua53 package is right now an SPK internal packaging of lua 5.3.5.
+We decided to crate our own lua packaging so that we could install it side by side
+RedHats default installation.
 
 ## Credits
 
