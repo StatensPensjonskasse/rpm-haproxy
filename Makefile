@@ -1,18 +1,27 @@
 HOME=$(shell pwd)
 MAINVERSION=2.0
-VERSION=$(shell wget -qO- http://git.haproxy.org/git/haproxy-${MAINVERSION}.git/refs/tags/ | sed -n 's:.*>\(.*\)</a>.*:\1:p' | sed 's/^.//' | sort -rV | head -1)
-ifeq ("${VERSION}","./")
-        VERSION="${MAINVERSION}.0"
+ifeq ("${VERSION}", "")
+		VERSION=$(shell wget -qO- http://git.haproxy.org/git/haproxy-${MAINVERSION}.git/refs/tags/ | sed -n 's:.*>\(.*\)</a>.*:\1:p' | sed 's/^.//' | sort -rV | head -1)
 endif
-RELEASE=1
+ifeq ("${VERSION}","./")
+		VERSION="${MAINVERSION}.0"
+endif
+ifeq ("${RELEASE}", "")
+        RELEASE=1
+endif
 
 all: build
 
 install_prereq:
 	sudo yum install -y pcre-devel make gcc openssl-devel rpm-build systemd-devel wget sed zlib-devel
 
+check_lua_env:
+	@if  [ -z "${LUA_PACKAGE}" ]; then echo "Environment not prepared for build with Lua. Run 'prep-lua-deps.sh' and 'source setEnv'";  exit 1; fi;
+	@if  [ -z "${LUA_INC}" ]; then echo "Environment not prepared for build with Lua. Run 'prep-lua-deps.sh' and 'source setEnv'";  exit 1; fi;
+	@if  [ -z "${LUA_LIB}" ]; then echo "Environment not prepared for build with Lua. Run 'prep-lua-deps.sh' and 'source setEnv'";  exit 1; fi;
+
 install_lua:
-	sudo yum install -y lua53
+	sudo yum install -y ${LUA_PACKAGE}
 
 clean:
 	rm -f ./SOURCES/haproxy-${VERSION}.tar.gz
@@ -34,16 +43,16 @@ build: install_prereq clean download-upstream
 	--define "_rpmdir %{_topdir}/RPMS" \
 	--define "_srcrpmdir %{_topdir}/SRPMS"
 
-build-with-lua: install_prereq install_lua clean download-upstream
+build-with-lua: check_lua_env install_prereq install_lua clean download-upstream
 	cp -r ./SPECS/* ./rpmbuild/SPECS/ || true
 	cp -r ./SOURCES/* ./rpmbuild/SOURCES/ || true
 	rpmbuild -ba SPECS/haproxy.spec \
 	--define "version ${VERSION}" \
 	--define "release ${RELEASE}" \
 	--define "use_lua 1" \
-	--define "lua_package lua53" \
-	--define "lua_inc /opt/lua53/include" \
-	--define "lua_lib /opt/lua53/lib" \
+	--define "lua_package ${LUA_PACKAGE}" \
+	--define "lua_inc ${LUA_INC}" \
+	--define "lua_lib ${LUA_LIB}" \
 	--define "_topdir %(pwd)/rpmbuild" \
 	--define "_builddir %{_topdir}/BUILD" \
 	--define "_buildroot %{_topdir}/BUILDROOT" \
