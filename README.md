@@ -36,13 +36,18 @@ Resulting RPM will be in /opt/rpm-haproxy/rpmbuild/RPMS/x86_64/
 
 ## Build haproxy with lua
 
-    make build-with-lua
+To build haproxy with Lua Yoy need a yum-repo with Lua 5.3.x available.
+You also need to define the following environment variables before running make:
+    LUA_PACKAGE: The name of the package to install
+    LUA_INC:     Path to Lua include files.
+    LUA_LIB:     Path to Lua library files.
 
-This goal is building haproxy with lua 5.3 binding.
-The build relies on a yum repository with lua53 package available on the build host.
-This lua53 package is right now an SPK internal packaging of lua 5.3.5.
-We decided to crate our own lua packaging so that we could install it side by side
-RedHats default installation.
+Use the utility script 'prep-lua-deps.sh' to create a repo definition in /etc/yum.repos.d
+and to create a setEnv file to source before running make.
+
+    ./prep-lua-deps.sh
+    source setEnv
+    make clean build-with-lua
 
 ## Credits
 
