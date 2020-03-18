@@ -38,6 +38,7 @@ Resulting RPM will be in /opt/rpm-haproxy/rpmbuild/RPMS/x86_64/
 
 To build haproxy with Lua Yoy need a yum-repo with Lua 5.3.x available.
 You also need to define the following environment variables before running make:
+
     LUA_PACKAGE: The name of the package to install
     LUA_INC:     Path to Lua include files.
     LUA_LIB:     Path to Lua library files.
