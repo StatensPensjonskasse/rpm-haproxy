@@ -8,7 +8,8 @@ Vagrant.configure("2") do |config|
       sudo -u vagrant ln -s /vagrant/SPECS/ SPECS
       sudo -u vagrant ln -s /vagrant/SOURCES/ SOURCES
       sudo -u vagrant ln -s /vagrant/Makefile Makefile
-      sudo -u vagrant ln -s /vagrant/prep-lua-deps.sh prep-lua-deps.sh
+      sudo -u vagrant ln -s /vagrant/install-lua-repo.sh install-lua-repo.sh
+      sudo -u vagrant ln -s /vagrant/prep-setenv.sh prep-setenv.sh
     fi
   SHELL
 end
