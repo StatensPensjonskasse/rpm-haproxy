@@ -36,19 +36,34 @@ Resulting RPM will be in /opt/rpm-haproxy/rpmbuild/RPMS/x86_64/
 
 ## Build haproxy with lua
 
-To build haproxy with Lua Yoy need a yum-repo with Lua 5.3.x available.
-You also need to define the following environment variables before running make:
+To build haproxy with Lua you need a yum-repo with Lua 5.3.x available.
+You also need to export the following environment variables before running make:
 
+    USE_LUA:     Set to 1
     LUA_PACKAGE: The name of the package to install
     LUA_INC:     Path to Lua include files.
     LUA_LIB:     Path to Lua library files.
 
-Use the utility script 'prep-lua-deps.sh' to create a repo definition in /etc/yum.repos.d
-and to create a setEnv file to source before running make.
+Use the utility script 'install-lua-repo.sh' to create a repo definition in /etc/yum.repos.d
+and 'prep-setenv.sh' to create a setEnv file to source before running make.
 
-    ./prep-lua-deps.sh
+    ./install-lua-repo.sh
+    ./prep-setenv.sh
     source setEnv
-    make clean build-with-lua
+    make
+
+## Build haproxy with prometheus-exporter
+
+To build haproxy with prometheus-exporter you need to export the following
+environment variable before running make:
+
+    EXTRA_OBJS: "contrib/prometheus-exporter/service-prometheus.o"
+
+Use the utility script 'prep-setenv.sh' to create a setEnv file to source before running make.
+
+    ./prep-setenv.sh
+    source setEnv
+    make
 
 ## Credits
 
